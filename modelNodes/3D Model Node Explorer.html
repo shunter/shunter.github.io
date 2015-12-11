@@ -122,29 +122,52 @@ var modelUrl = '../../SampleData/models/CesiumMan/Cesium_Man.glb';
 var viewModel = {
     nodeName : undefined,
     showTranslation : false,
-    translationX : 0.0,
-    translationY : 0.0,
-    translationZ : 0.0,
     showRotation : false,
-    rotationHeading : 0.0,
-    rotationPitch : 0.0,
-    rotationRoll : 0.0,
     showScale : false,
-    scaleX : 1.0,
-    scaleY : 1.0,
-    scaleZ : 1.0
+    transformations: {}
 };
 
 Cesium.knockout.track(viewModel);
 
+Cesium.knockout.defineProperty(viewModel, 'transformation', function() {
+    var transformations = viewModel.transformations;
+    var nodeName = viewModel.nodeName;
+    if (!Cesium.defined(transformations[nodeName])) {
+        transformations[nodeName] = {
+    translationX : 0.0,
+    translationY : 0.0,
+    translationZ : 0.0,
+    rotationHeading : 0.0,
+    rotationPitch : 0.0,
+    rotationRoll : 0.0,
+    scaleX : 1.0,
+    scaleY : 1.0,
+    scaleZ : 1.0
+};
+        Cesium.knockout.track(transformations[nodeName]);
+    }
+    return transformations[nodeName];
+});
+
+['translationX', 'translationY', 'translationZ', 'rotationHeading', 'rotationPitch', 'rotationRoll', 'scaleX', 'scaleY', 'scaleZ'].forEach(function(p) {
+    Cesium.knockout.defineProperty(viewModel, p, {
+        get: function() {
+            return viewModel.transformation[p];
+        },
+        set: function(value) {
+            viewModel.transformation[p] = +value;
+        } 
+    });
+});
+
 Cesium.knockout.defineProperty(viewModel, 'translation', function() {
-    return new Cesium.Cartesian3(+viewModel.translationX, +viewModel.translationY, +viewModel.translationZ);
+    return new Cesium.Cartesian3(viewModel.translationX, viewModel.translationY, viewModel.translationZ);
 });
 Cesium.knockout.defineProperty(viewModel, 'rotation', function() {
-    return Cesium.Quaternion.fromHeadingPitchRoll(+viewModel.rotationHeading, +viewModel.rotationPitch, +viewModel.rotationRoll);
+    return Cesium.Quaternion.fromHeadingPitchRoll(viewModel.rotationHeading, viewModel.rotationPitch, viewModel.rotationRoll);
 });
 Cesium.knockout.defineProperty(viewModel, 'scale', function() {
-    return new Cesium.Cartesian3(+viewModel.scaleX, +viewModel.scaleY, +viewModel.scaleZ);
+    return new Cesium.Cartesian3(viewModel.scaleX, viewModel.scaleY, viewModel.scaleZ);
 });
 Cesium.knockout.defineProperty(viewModel, 'matrix', function() {
     return Cesium.Matrix4.fromTranslationQuaternionRotationScale(viewModel.translation, viewModel.rotation, viewModel.scale);
@@ -183,22 +206,11 @@ model.readyPromise.then(function(model) {
     camera.lookAt(center, new Cesium.HeadingPitchRange(heading, pitch, r * 2.0));
     
     // enumerate nodes and add options
-    var nodesByName = model._runtime.nodesByName;
-    
-    var options = Object.keys(nodesByName).map(function(nodeName) {
+    var options = Object.keys(model._runtime.nodesByName).map(function(nodeName) {
        return {
            text : nodeName,
            onselect : function() {
                viewModel.nodeName = nodeName;
-               viewModel.translationX = 0.0;
-               viewModel.translationY = 0.0;
-               viewModel.translationZ = 0.0;
-               viewModel.rotationHeading = 0.0;
-               viewModel.rotationPitch = 0.0;
-               viewModel.rotationRoll = 0.0;
-               viewModel.scaleX = 1.0;
-               viewModel.scaleY = 1.0;
-               viewModel.scaleZ = 1.0;
            }
        };
     });
