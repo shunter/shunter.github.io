@@ -4,7 +4,7 @@
   <meta charset="utf-8">
   <meta http-equiv="X-UA-Compatible" content="IE=Edge,chrome=1">  <!-- Use Chrome Frame in IE -->
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, minimum-scale=1, user-scalable=no">
-  <meta name="description" content="CZML Model">
+  <meta name="description" content="CZML Model - Node Transformations">
   <meta name="cesium-sandcastle-labels" content="CZML">
   <title>Cesium Demo</title>
   <script type="text/javascript" src="../Sandcastle-header.js"></script>
@@ -37,52 +37,40 @@ var czml = [
         "name" : "CZML Model",
         "version" : "1.0",
         "clock": {
-            "interval": "2015-01-01T00:00:00Z/2015-01-01T00:00:15Z",
+            "interval": "2015-01-01T00:00:00Z/2015-01-01T00:00:20Z",
             "currentTime": "2015-01-01T00:00:00Z",
-            "multiplier": 1,
-            "range": "LOOP_STOP"
+            "multiplier": 20
         }
     }, {
-        "id" : "aircraft model",
-        "name" : "Cesium Air",
+        "id" : "model",
         "position" : {
           "cartographicDegrees" : [
-            -77, 37, 10000
+            -77, 37, 100000
+          ]
+        },
+        "viewFrom" : {
+            "cartesian" : [
+                4.3, 0.1, 2.6
           ]
         },
         "model": {
-            "gltf" : "../../SampleData/models/CesiumAir/Cesium_Air.glb",
-            "scale" : 2.0,
-            "minimumPixelSize": 128,
+            "gltf" : "../../SampleData/models/CesiumMan/Cesium_Man.glb",
             "runAnimations": false,
             "nodeTransformations": {
-                "Prop": {
-                    "scale": {
-                        "epoch": "2015-01-01T00:00:00Z",
-                        "cartesian": [
-                          0, 1, 1, 1,
-                          5, 5, 1, 5,
-                          10, 1, 5, 5,
-                          15, 5, 5, 5
-                        ]
-                    },
+                "Skeleton_arm_joint_L__3_": {
                     "rotation": {
                         "epoch": "2015-01-01T00:00:00Z",
                         "unitQuaternion":[
-                          0,0,0,0,1,
-                          5,0,0.3826834323650898,0,0.9238795325112867,
-                          15,-0.27059805007309856,0.27059805007309856,0.6532814824381883,0.6532814824381884
+                          0,-0.7762877147481148, -0.16428915803853994, 0.3706585477262082, 0.482699386243276,
+                          10,-0.6840422631464792, -0.40211904424847345, 0.05175867757399086, 0.6063888981321548,
+                          20,-0.7762877147481148, -0.16428915803853994, 0.3706585477262082, 0.482699386243276
                         ]
                     }
                 },
-                "Prop__2_": {
-                    "scale": {
-                        "epoch": "2015-01-01T00:00:00Z",
-                        "cartesian": [
-                          0, 5, 5, 5,
-                          5, 5, 1, 5,
-                          10, 1, 5, 5,
-                          15, 1, 1, 1
+                "Skeleton_arm_joint_R__2_": {
+                    "rotation": {
+                        "unitQuaternion": [
+                          0.31933321618140015, 0.5055578277509731, -0.5903490075872426, 0.5421490838170975
                         ]
                     }
                 }                
@@ -95,7 +83,7 @@ var viewer = new Cesium.Viewer('cesiumContainer');
 var promise = viewer.dataSources.add(Cesium.CzmlDataSource.load(czml));
 
 promise.then(function(dataSource){
-    viewer.trackedEntity = dataSource.entities.getById('aircraft model');
+    viewer.trackedEntity = dataSource.entities.getById('model');
 }).otherwise(function(error){
     window.alert(error);
 });
